@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartSpeak: Learn Nigerian Languages</title>
+    <meta name="theme-color" content="#BBF800">
+    <meta name="keywords" content="SmartSpeak, Nigerian languages, Yoruba, Igbo, Hausa, Ijaw, Efik, language learning, African languages, learn Yoruba, learn Igbo, learn Hausa, language app, mobile language app, Nigerian culture, speak Nigerian languages">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="https://placehold.co/192x192/BBF800/000?text=S" type="image/png">
+    <link rel="apple-touch-icon" href="https://placehold.co/192x192/BBF800/000?text=S">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script async src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        .ripple {
+            position: relative;
+            overflow: hidden;
+        }
+        .ripple-effect {
+            position: absolute;
+            border-radius: 50%;
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+            background: rgba(187, 248, 0, 0.4);
+            pointer-events: none;
+        }
+        @keyframes ripple {
+            to {
+                transform: scale(2.5);
+                opacity: 0;
+            }
+        }
+        .bottom-sheet {
+            animation: slideInSheet 0.4s cubic-bezier(.4,0,.2,1);
+        }
+        @keyframes slideInSheet {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        .fade-in {
+            animation: fadeInMobile 0.4s cubic-bezier(.4,0,.2,1);
+        }
+        @keyframes fadeInMobile {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .btn-base:active {
+            background-color: #aee800;
+            box-shadow: 0 2px 8px #BBF800;
+        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            color: white;
+            background: #0d0d0d;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .bottom-sheet {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 200;
+            background: #232323;
+            border-top-left-radius: 1.5rem;
+            border-top-right-radius: 1.5rem;
+            box-shadow: 0 -2px 24px rgba(0,0,0,0.2);
+            transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .bottom-sheet-header {
+            width: 100%;
+            text-align: center;
+            padding: 1rem 0 0.5rem 0;
+        }
+        .bottom-sheet-drag {
+            width: 48px;
+            height: 6px;
+            background: #444;
+            border-radius: 3px;
+            margin: 0 auto 8px auto;
+        }
+        @media (max-width: 640px) {
+            .page-content {
+                padding: 0.5rem !important;
+                border-radius: 0.5rem !important;
+            }
+            #bottom-nav {
+                padding: 0.5rem 0.5rem !important;
+                font-size: 1rem !important;
+            }
+            .btn-base {
+                font-size: 1rem !important;
+                padding: 0.75rem 1.5rem !important;
+            }
+        }
+        #threejs-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.5;
+            transition: opacity 1s ease-in-out;
+        }
+        .preloader-bg {
+            background: #1a1a1a;
+        }
+        .preloader-svg {
+            animation: pulse 2s infinite ease-in-out;
+        }
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+        .text-accent {
+            color: #BBF800;
+        }
+        .bg-accent {
+            background-color: #BBF800;
+        }
+        .shadow-accent {
+            box-shadow: 0 0 20px #BBF800;
+        }
+        .btn-base {
+            transition: all 0.3s ease;
+        }
+        .btn-base:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(187, 248, 0, 0.4);
+        }
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+        .toast {
+            animation: slideIn 0.5s forwards, fadeOut 0.5s 4.5s forwards;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+        .page-content {
+            animation: fadeIn 0.5s forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        #bottom-nav a {
+            transition: color 0.3s ease;
+        }
+        #bottom-nav a:hover {
+            color: #BBF800;
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body class="bg-[#0D0D0D]">
+
+    <!-- Three.js Background Canvas -->
+    <canvas id="threejs-container" class="opacity-30"></canvas>
+
+    <!-- Preloader -->
+    <div id="preloader" class="fixed inset-0 preloader-bg flex flex-col items-center justify-center z-[100] transition-opacity duration-1000 ease-in-out">
+        <div class="preloader-svg w-32 h-32 mb-4">
+            <!-- SmartSpeak Logo SVG -->
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" fill="#BBF800" stroke="#BBF800" stroke-width="2">
+                <path d="M50,10 A40,40 0 1,1 50,90 A40,40 0 1,1 50,10 Z M50,20 A30,30 0 1,0 50,80 A30,30 0 1,0 50,20 Z" fill="none"/>
+                <circle cx="50" cy="50" r="15" fill="#BBF800" class="preloader-circle-fill"/>
+                <text x="50" y="55" font-family="Verdana" font-size="20" text-anchor="middle" fill="#000" font-weight="bold">S</text>
+            </svg>
+        </div>
+        <div class="text-white text-lg font-bold">SmartSpeak</div>
+        <div class="w-1/2 mt-4 bg-gray-700 h-1 rounded-full overflow-hidden">
+            <div id="loading-bar" class="bg-accent h-full transition-all duration-300" style="width: 0%;"></div>
+        </div>
+    </div>
+
+    <!-- Main App Container -->
+    <div id="app" class="relative z-10 min-h-screen flex flex-col transition-opacity duration-500 opacity-0">
+        <!-- Content will be injected here via JavaScript -->
+        <div id="content-container" class="flex-grow p-4 md:p-8"></div>
+
+        <!-- Bottom Navigation Bar -->
+        <nav id="bottom-nav" aria-label="Main navigation" class="fixed bottom-0 left-0 right-0 bg-[#1A1A1A] bg-opacity-90 backdrop-blur-md px-2 py-2 flex justify-between items-center rounded-t-2xl shadow-2xl border-t border-gray-800 md:px-16 md:py-4">
+            <a href="#home" data-page="home" class="nav-link flex-1 flex flex-col items-center py-2 text-gray-400 hover:text-accent focus:text-accent focus:outline-none transition-all duration-300 rounded-lg" aria-label="Home">
+                <i class="fas fa-home text-2xl"></i>
+                <span class="text-xs mt-1">Home</span>
+            </a>
+            <a href="#languages" data-page="languages" class="nav-link flex-1 flex flex-col items-center py-2 text-gray-400 hover:text-accent focus:text-accent focus:outline-none transition-all duration-300 rounded-lg" aria-label="Languages">
+                <i class="fas fa-language text-2xl"></i>
+                <span class="text-xs mt-1">Languages</span>
+            </a>
+            <a href="#profile" data-page="profile" class="nav-link flex-1 flex flex-col items-center py-2 text-gray-400 hover:text-accent focus:text-accent focus:outline-none transition-all duration-300 rounded-lg" aria-label="Profile">
+                <i class="fas fa-user text-2xl"></i>
+                <span class="text-xs mt-1">Profile</span>
+            </a>
+            <a href="#settings" data-page="settings" class="nav-link flex-1 flex flex-col items-center py-2 text-gray-400 hover:text-accent focus:text-accent focus:outline-none transition-all duration-300 rounded-lg" aria-label="Settings">
+                <i class="fas fa-cog text-2xl"></i>
+                <span class="text-xs mt-1">Settings</span>
+            </a>
+            <a href="#about" data-page="about" class="nav-link flex-1 flex flex-col items-center py-2 text-gray-400 hover:text-accent focus:text-accent focus:outline-none transition-all duration-300 rounded-lg" aria-label="About">
+                <i class="fas fa-info-circle text-2xl"></i>
+                <span class="text-xs mt-1">About</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Cookie Consent Modal -->
+    <div id="cookie-modal" class="fixed inset-0 z-[101] hidden flex items-center justify-center p-4">
+        <div class="modal-overlay absolute inset-0"></div>
+        <div class="bg-[#1A1A1A] rounded-2xl shadow-lg p-6 max-w-lg w-full transform -translate-y-4 transition-transform duration-500 relative border border-gray-700">
+            <div id="modal-threejs" class="h-24 w-full mb-4 rounded-xl overflow-hidden"></div>
+            <h2 class="text-xl font-bold mb-2 text-accent">Cookie Policy</h2>
+            <p class="text-gray-300 text-sm mb-4">We use cookies to enhance your experience and provide personalized content. By continuing to use this app, you agree to our use of cookies and local storage for authentication and preferences.</p>
+            <div class="flex justify-end gap-2">
+                <button id="accept-cookies" class="btn-base bg-accent text-black font-bold py-2 px-4 rounded-full">Accept</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Push Notification Toast Container -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+    <script>
+        // Check for Service Worker support
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js').then(registration => {
+                    console.log('Service Worker registered with scope:', registration.scope);
+                }).catch(err => {
+                    console.log('Service Worker registration failed:', err);
+                });
+            });
+        }
+    </script>
+    <script>
+        // Main App JavaScript
+            // Fetch user analytics from backend
+            window.fetchUserAnalytics = async (token) => {
+                try {
+                    const res = await fetch('http://localhost:5000/api/analytics/user', {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    const analytics = await res.json();
+                    showToast('Analytics', `Streak: ${analytics.streak}, Progress: ${analytics.progress}%`, 3000);
+                    return analytics;
+                } catch (err) {
+                    showToast('Error', 'Failed to fetch analytics.', 3000);
+                    return null;
+                }
+            };
+
+            // Send push notification
+            window.sendNotification = async (token, message) => {
+                try {
+                    const res = await fetch('http://localhost:5000/api/notifications/send', {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ message })
+                    });
+                    const result = await res.json();
+                    showToast('Notification', result.message, 3000);
+                } catch (err) {
+                    showToast('Error', 'Failed to send notification.', 3000);
+                }
+            };
+
+            // Share progress to social
+            window.shareProgress = async (token) => {
+                try {
+                    const res = await fetch('http://localhost:5000/api/social/share', {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    const result = await res.json();
+                    showToast('Social', result.message, 3000);
+                } catch (err) {
+                    showToast('Error', 'Failed to share progress.', 3000);
+                }
+            };
+
+            // Swipe gesture for bottom sheet modal
+            function enableSwipeSheet(sheetId) {
+                const sheet = document.getElementById(sheetId);
+                if (!sheet) return;
+                let startY = null;
+                let currentY = null;
+                let dragging = false;
+                sheet.addEventListener('touchstart', (e) => {
+                    if (e.touches.length === 1) {
+                        startY = e.touches[0].clientY;
+                        dragging = true;
+                    }
+                });
+                sheet.addEventListener('touchmove', (e) => {
+                    if (dragging && e.touches.length === 1) {
+                        currentY = e.touches[0].clientY;
+                        const deltaY = currentY - startY;
+                        if (deltaY > 0) {
+                            sheet.style.transform = `translateY(${deltaY}px)`;
+                        }
+                    }
+                });
+                sheet.addEventListener('touchend', (e) => {
+                    if (dragging) {
+                        const deltaY = currentY - startY;
+                        if (deltaY > 100) {
+                            sheet.style.transform = `translateY(100%)`;
+                            setTimeout(() => { sheet.style.display = 'none'; }, 300);
+                        } else {
+                            sheet.style.transform = '';
+                        }
+                        dragging = false;
+                        startY = null;
+                        currentY = null;
+                    }
+                });
+            }
+            // Fetch user profile from backend
+            window.fetchUserProfile = async (token) => {
+                try {
+                    const res = await fetch('http://localhost:5000/api/users/profile', {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    const profile = await res.json();
+                    showToast('Profile', `Fetched profile for ${profile.name || 'N/A'}`, 3000);
+                    return profile;
+                } catch (err) {
+                    showToast('Error', 'Failed to fetch profile.', 3000);
+                    return null;
+                }
+            };
+        document.addEventListener('DOMContentLoaded', () => {
+            const preloader = document.getElementById('preloader');
+            const app = document.getElementById('app');
+            const contentContainer = document.getElementById('content-container');
+            const navLinks = document.querySelectorAll('#bottom-nav a');
+            const cookieModal = document.getElementById('cookie-modal');
+            const modalThreejsContainer = document.getElementById('modal-threejs');
+            const toastContainer = document.getElementById('toast-container');
+            const userId = localStorage.getItem('userId') || crypto.randomUUID();
+
+            let threejsScene, threejsCamera, threejsRenderer, particles, raycaster, mouse;
+            let currentToastId = 0;
+            const state = {
+                loggedIn: false,
+                currentPage: 'home'
+            };
+
+            // --- PWA Manifest & Service Worker ---
+            const manifest = {
+                name: 'SmartSpeak',
+                short_name: 'SmartSpeak',
+                description: 'Your guide to speaking Nigerian languages.',
+                start_url: '/',
+                display: 'standalone',
+                background_color: '#0d0d0d',
+                theme_color: '#BBF800',
+                icons: [
+                    { src: 'https://placehold.co/192x192/BBF800/000?text=S', sizes: '192x192', type: 'image/png' },
+                    { src: 'https://placehold.co/512x512/BBF800/000?text=S', sizes: '512x512', type: 'image/png' }
+                ]
+            };
+            const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+            const manifestUrl = URL.createObjectURL(manifestBlob);
+            const manifestLink = document.createElement('link');
+            manifestLink.rel = 'manifest';
+            manifestLink.href = manifestUrl;
+            document.head.appendChild(manifestLink);
+
+            const serviceWorkerContent = `
+                const CACHE_NAME = 'smart-speak-cache-v1';
+                const urlsToCache = [
+                    '/',
+                    'index.html',
+                    'https://cdn.tailwindcss.com',
+                    'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css',
+                    'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
+                    'https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap'
+                ];
+
+                self.addEventListener('install', event => {
+                    event.waitUntil(
+                        caches.open(CACHE_NAME).then(cache => {
+                            return cache.addAll(urlsToCache);
+                        })
+                    );
+                });
+
+                self.addEventListener('fetch', event => {
+                    event.respondWith(
+                        caches.match(event.request).then(response => {
+                            return response || fetch(event.request);
+                        })
+                    );
+                });
+
+                self.addEventListener('push', event => {
+                    const data = event.data.json();
+                    const title = data.title;
+                    const options = {
+                        body: data.body,
+                        icon: 'https://placehold.co/192x192/BBF800/000?text=S',
+                        badge: 'https://placehold.co/192x192/BBF800/000?text=S'
+                    };
+                    event.waitUntil(self.registration.showNotification(title, options));
+                });
+            `;
+            const serviceWorkerBlob = new Blob([serviceWorkerContent], { type: 'application/javascript' });
+            const serviceWorkerUrl = URL.createObjectURL(serviceWorkerBlob);
+            navigator.serviceWorker.register(serviceWorkerUrl).then(reg => {
+                console.log('Service Worker registered for PWA.');
+            }).catch(e => console.error('Service Worker registration failed:', e));
+
+            // --- UI and App Logic ---
+
+            const renderPage = (pageName) => {
+                // Country selector for phone input
+                setTimeout(() => {
+                    const countrySelect = document.getElementById('reg-country');
+                    const flagSpan = document.getElementById('reg-flag');
+                    const codeSpan = document.getElementById('reg-code');
+                    if (countrySelect && flagSpan && codeSpan) {
+                        countrySelect.onchange = function() {
+                            const selected = countrySelect.options[countrySelect.selectedIndex];
+                            flagSpan.textContent = selected.getAttribute('data-flag');
+                            codeSpan.textContent = selected.getAttribute('data-code');
+                        };
+                    }
+                }, 100);
+                // Add ripple effect to all .btn-base buttons
+                setTimeout(() => {
+                    document.querySelectorAll('.btn-base').forEach(btn => {
+                        btn.classList.add('ripple');
+                        btn.addEventListener('click', function(e) {
+                            const circle = document.createElement('span');
+                            circle.className = 'ripple-effect';
+                            const rect = btn.getBoundingClientRect();
+                            circle.style.width = circle.style.height = Math.max(rect.width, rect.height) + 'px';
+                            circle.style.left = (e.clientX - rect.left - rect.width/2) + 'px';
+                            circle.style.top = (e.clientY - rect.top - rect.height/2) + 'px';
+                            btn.appendChild(circle);
+                            setTimeout(() => circle.remove(), 600);
+                        });
+                    });
+                }, 100);
+                contentContainer.innerHTML = ''; // Clear content
+                let html = '';
+                let title = '';
+
+                switch (pageName) {
+                    case 'home':
+                        title = 'Welcome to SmartSpeak';
+                        html = `
+                            <div class="page-content text-center py-12 px-4 rounded-xl bg-[#1A1A1A] bg-opacity-70 backdrop-blur-sm border border-gray-700">
+                                <h1 class="text-3xl md:text-5xl font-bold mb-4">Master Nigerian Languages</h1>
+                                <p class="text-md md:text-lg text-gray-300 max-w-2xl mx-auto">SmartSpeak is a dynamic platform designed to help you learn and speak major Nigerian languages fluently. Dive into rich content, interactive lessons, and real-time pronunciation practice.</p>
+                                <div class="mt-8 flex justify-center gap-4">
+                                    <button onclick="router.navigate('languages')" class="btn-base bg-accent text-black font-bold py-3 px-8 rounded-full shadow-accent">Start Learning</button>
+                                </div>
+                            </div>
+                        `;
+                        break;
+                    case 'languages':
+                        title = 'Choose a Language';
+                        html = `
+                            <div class="page-content rounded-xl bg-[#1A1A1A] bg-opacity-70 backdrop-blur-sm border border-gray-700 p-6 md:p-8">
+                                <h1 class="text-3xl md:text-4xl font-bold mb-6 text-center">Languages</h1>
+                                <div class="flex justify-end mb-4">
+                                    <button id="fetch-lessons-btn" class="btn-base bg-accent text-black font-bold py-2 px-6 rounded-full shadow-accent">Fetch Lessons from Backend</button>
+                                </div>
+                                <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                                    ${['Yoruba', 'Igbo', 'Hausa', 'Ijaw', 'Efik'].map(lang => `
+                                        <div class="flex flex-col items-center p-4 bg-[#2A2A2A] rounded-xl shadow-md border border-gray-600 transition-all duration-300 hover:scale-105 cursor-pointer" onclick="speakLesson('${lang}')">
+                                            <div class="w-16 h-16 rounded-full bg-accent text-black flex items-center justify-center text-3xl font-bold mb-2">${lang[0]}</div>
+                                            <span class="text-sm md:text-lg font-semibold">${lang}</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `;
+                        break;
+                    case 'profile':
+                        title = 'User Profile';
+                        const username = localStorage.getItem('username') || 'Guest';
+                        html = `
+                            <div class="bottom-sheet" id="profile-sheet">
+                                <div class="bottom-sheet-header">
+                                    <div class="bottom-sheet-drag"></div>
+                                    <h1 class="text-xl font-bold">Profile</h1>
+                                </div>
+                                <div class="w-full max-w-md mx-auto flex flex-col gap-4 p-4">
+                                    <div class="flex flex-col items-center gap-2 mb-4">
+                                        <div class="w-20 h-20 rounded-full bg-accent flex items-center justify-center text-4xl font-bold shadow-accent mb-2">
+                                            <i class="fas fa-user text-black"></i>
+                                        </div>
+                                        <h2 class="text-2xl md:text-3xl font-bold text-center">Welcome, <span id="profile-username">${username}</span></h2>
+                                        <p class="text-gray-400 text-xs md:text-sm">Your unique ID: <span class="font-mono select-all">${userId}</span></p>
+                                    </div>
+                                    <div class="flex flex-col gap-2 bg-[#232323] rounded-xl p-4 border border-gray-700">
+                                        <input id="username-input" type="text" placeholder="Change your name" class="w-full p-3 rounded-lg bg-gray-800 text-white placeholder-gray-500 border border-gray-700">
+                                        <button onclick="saveUsername()" class="btn-base bg-accent text-black font-bold py-2 px-6 rounded-full">Save Name</button>
+                                    </div>
+                                    <div class="flex flex-col gap-2 bg-[#232323] rounded-xl p-4 border border-gray-700 mt-4">
+                                        <div class="flex justify-center mb-4">
+                                            <button id="tab-signup" class="btn-base bg-accent text-black font-bold py-2 px-6 rounded-full mr-2">Sign Up</button>
+                                            <button id="tab-signin" class="btn-base bg-gray-700 text-white font-bold py-2 px-6 rounded-full">Sign In</button>
+                                        </div>
+                                        <div id="auth-forms">
+                                            <form id="signup-form" autocomplete="off">
+                                                <div class="relative mb-2">
+                                                    <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-accent"><i class="fas fa-user"></i></span>
+                                                    <input id="reg-name" type="text" placeholder="Name" class="w-full p-3 pl-10 rounded-lg bg-gray-800 text-white placeholder-gray-500 border border-gray-700" required>
+                                                </div>
+                                                <div class="relative mb-2">
+                                                    <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-accent"><i class="fas fa-envelope"></i></span>
+                                                    <input id="reg-email" type="email" placeholder="Email" class="w-full p-3 pl-10 rounded-lg bg-gray-800 text-white placeholder-gray-500 border border-gray-700" required>
+                                                </div>
+                                                <div class="relative mb-2 flex gap-2 items-center">
+                                                    <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-accent"><i class="fas fa-phone"></i></span>
+                                                    <select id="reg-country" class="w-1/3 p-3 pl-10 rounded-lg bg-gray-800 text-white border border-gray-700">
+                                                        <option value="NG" data-code="+234" data-flag="🇳🇬">Nigeria (+234)</option>
+                                                        <option value="GH" data-code="+233" data-flag="🇬🇭">Ghana (+233)</option>
+                                                        <option value="KE" data-code="+254" data-flag="🇰🇪">Kenya (+254)</option>
+                                                        <option value="ZA" data-code="+27" data-flag="🇿🇦">South Africa (+27)</option>
+                                                        <option value="US" data-code="+1" data-flag="🇺🇸">USA (+1)</option>
+                                                    </select>
+                                                    <input id="reg-phone" type="tel" placeholder="Phone" class="w-2/3 p-3 pl-4 pr-16 rounded-lg bg-gray-800 text-white placeholder-gray-500 border border-gray-700" required>
+                                                    <span id="reg-flag" class="absolute right-12 top-1/2 transform -translate-y-1/2 text-2xl">🇳🇬</span>
+                                                    <span id="reg-code" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-accent font-bold">+234</span>
+                                                </div>
+                                                <div class="relative mb-2">
+                                                    <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-accent"><i class="fas fa-lock"></i></span>
+                                                    <input id="reg-password" type="password" placeholder="Password" class="w-full p-3 pl-10 pr-10 rounded-lg bg-gray-800 text-white placeholder-gray-500 border border-gray-700" required>
+                                                    <span id="reg-eye" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer"><i class="fas fa-eye"></i></span>
+                                                </div>
+                                                <button id="register-btn" type="submit" class="btn-base bg-accent text-black font-bold py-2 px-6 rounded-full">Sign Up</button>
+                                            </form>
+                                            <form id="signin-form" class="hidden" autocomplete="off">
+                                                <div class="relative mb-2">
+                                                    <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-accent"><i class="fas fa-envelope"></i></span>
+                                                    <input id="login-email" type="email" placeholder="Email" class="w-full p-3 pl-10 rounded-lg bg-gray-800 text-white placeholder-gray-500 border border-gray-700" required>
+                                                </div>
+                                                <div class="relative mb-2">
+                                                    <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-accent"><i class="fas fa-lock"></i></span>
+                                                    <input id="login-password" type="password" placeholder="Password" class="w-full p-3 pl-10 pr-10 rounded-lg bg-gray-800 text-white placeholder-gray-500 border border-gray-700" required>
+                                                    <span id="login-eye" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer"><i class="fas fa-eye"></i></span>
+                                                </div>
+                                                <button id="login-btn" type="submit" class="btn-base bg-accent text-black font-bold py-2 px-6 rounded-full">Sign In</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                // Tab switching for auth forms
+                setTimeout(() => {
+                    const tabSignup = document.getElementById('tab-signup');
+                    const tabSignin = document.getElementById('tab-signin');
+                    const signupForm = document.getElementById('signup-form');
+                    const signinForm = document.getElementById('signin-form');
+                    if (tabSignup && tabSignin && signupForm && signinForm) {
+                        tabSignup.onclick = () => {
+                            tabSignup.classList.add('bg-accent','text-black');
+                            tabSignin.classList.remove('bg-accent','text-black');
+                            tabSignin.classList.add('bg-gray-700','text-white');
+                            signupForm.classList.remove('hidden');
+                            signinForm.classList.add('hidden');
+                        };
+                        tabSignin.onclick = () => {
+                            tabSignin.classList.add('bg-accent','text-black');
+                            tabSignup.classList.remove('bg-accent','text-black');
+                            tabSignup.classList.add('bg-gray-700','text-white');
+                            signinForm.classList.remove('hidden');
+                            signupForm.classList.add('hidden');
+                        };
+                    }
+                }, 100);
+                // Eye toggle for password fields
+                setTimeout(() => {
+                    const regEye = document.getElementById('reg-eye');
+                    const regPassword = document.getElementById('reg-password');
+                    if (regEye && regPassword) {
+                        regEye.addEventListener('click', () => {
+                            regPassword.type = regPassword.type === 'password' ? 'text' : 'password';
+                            regEye.innerHTML = '<i class="fas fa-eye' + (regPassword.type === 'password' ? '' : '-slash') + '"></i>';
+                        });
+                    }
+                    const loginEye = document.getElementById('login-eye');
+                    const loginPassword = document.getElementById('login-password');
+                    if (loginEye && loginPassword) {
+                        loginEye.addEventListener('click', () => {
+                            loginPassword.type = loginPassword.type === 'password' ? 'text' : 'password';
+                            loginEye.innerHTML = '<i class="fas fa-eye' + (loginPassword.type === 'password' ? '' : '-slash') + '"></i>';
+                        });
+                    }
+                }, 100);
+                                    <div class="flex flex-col gap-2 bg-[#232323] rounded-xl p-4 border border-gray-700 mt-4">
+                                        <h2 class="text-lg font-bold mb-2">Fetch Profile (Backend)</h2>
+                                        <input id="profile-token" type="text" placeholder="JWT Token" class="w-full p-3 rounded-lg bg-gray-800 text-white placeholder-gray-500 border border-gray-700">
+                                        <button id="fetch-profile-btn" class="btn-base bg-accent text-black font-bold py-2 px-6 rounded-full">Fetch Profile</button>
+                                        <div id="profile-data" class="mt-2 text-gray-200 text-sm"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        break;
+                    case 'settings':
+                        title = 'App Settings';
+                        html = `
+                            <div class="page-content rounded-xl bg-[#1A1A2A] bg-opacity-70 backdrop-blur-sm border border-gray-700 p-6 md:p-8">
+                                <h1 class="text-3xl md:text-4xl font-bold mb-6 text-center">Settings</h1>
+                                <div class="flex flex-col gap-4">
+                                    <div class="flex items-center justify-between bg-[#2A2A2A] p-4 rounded-xl">
+                                        <span class="text-gray-200">Enable Push Notifications</span>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" value="" class="sr-only peer" id="notification-toggle">
+                                            <div class="w-11 h-6 bg-gray-500 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent"></div>
+                                        </label>
+                                    </div>
+                                    <div class="flex items-center justify-between bg-[#2A2A2A] p-4 rounded-xl">
+                                        <span class="text-gray-200">Clear Local Data</span>
+                                        <button onclick="clearLocalData()" class="btn-base bg-red-600 text-white font-bold py-2 px-4 rounded-full">Clear</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        break;
+                    case 'about':
+                        title = 'About SmartSpeak';
+                        html = `
+                            <div class="page-content text-center py-12 px-4 rounded-xl bg-[#1A1A1A] bg-opacity-70 backdrop-blur-sm border border-gray-700">
+                                <h1 class="text-3xl md:text-4xl font-bold mb-4">About SmartSpeak</h1>
+                                <p class="text-gray-300 max-w-xl mx-auto mb-4">SmartSpeak is a project dedicated to preserving and promoting the rich linguistic heritage of Nigeria. Our mission is to make learning these languages accessible and engaging for everyone, everywhere.</p>
+                                <p class="text-gray-400 text-sm">© 2023 SmartSpeak. All Rights Reserved.</p>
+                                <p class="text-gray-500 text-xs mt-2">Built with Three.js, Tailwind CSS, and pure JavaScript.</p>
+                            </div>
+                        `;
+                        break;
+                }
+                contentContainer.innerHTML = html;
+                document.title = `${title} | SmartSpeak`;
+                updateNav(pageName);
+                contentContainer.classList.add('fade-in');
+
+                // Swipe navigation between pages
+                let touchStartX = null;
+                let touchEndX = null;
+                contentContainer.addEventListener('touchstart', (e) => {
+                    if (e.touches.length === 1) touchStartX = e.touches[0].clientX;
+                });
+                contentContainer.addEventListener('touchend', (e) => {
+                    if (touchStartX !== null) {
+                        touchEndX = e.changedTouches[0].clientX;
+                        const deltaX = touchEndX - touchStartX;
+                        if (Math.abs(deltaX) > 60) {
+                            const pages = ['home','languages','profile','settings','about'];
+                            const idx = pages.indexOf(pageName);
+                            if (deltaX < 0 && idx < pages.length-1) router.navigate(pages[idx+1]);
+                            if (deltaX > 0 && idx > 0) router.navigate(pages[idx-1]);
+                        }
+                        touchStartX = null;
+                        touchEndX = null;
+                    }
+                });
+
+                // Pull-to-refresh for lessons
+                if (pageName === 'languages') {
+                    let startY = null;
+                    let refreshing = false;
+                    contentContainer.addEventListener('touchstart', (e) => {
+                        if (e.touches.length === 1) startY = e.touches[0].clientY;
+                    });
+                    contentContainer.addEventListener('touchend', async (e) => {
+                        if (startY !== null && e.changedTouches[0].clientY - startY > 80 && !refreshing) {
+                            refreshing = true;
+                            showToast('Refreshing', 'Reloading lessons...', 1500);
+                            const fetchLessonsBtn = document.getElementById('fetch-lessons-btn');
+                            if (fetchLessonsBtn) fetchLessonsBtn.click();
+                            setTimeout(() => { refreshing = false; }, 1200);
+                        }
+                        startY = null;
+                    });
+                }
+
+                // Wire backend calls to buttons
+                if (pageName === 'languages') {
+                    const fetchLessonsBtn = document.getElementById('fetch-lessons-btn');
+                    const lessonsList = document.createElement('div');
+                    lessonsList.id = 'lessons-list';
+                    fetchLessonsBtn.parentNode.insertAdjacentElement('afterend', lessonsList);
+                    if (fetchLessonsBtn) {
+                        fetchLessonsBtn.addEventListener('click', async () => {
+                            lessonsList.innerHTML = '<div class="text-gray-400">Loading lessons...</div>';
+                            const lessons = await window.fetchLessons();
+                            if (Array.isArray(lessons) && lessons.length > 0) {
+                                lessonsList.innerHTML = lessons.map(lesson => `
+                                    <div class="bg-[#232323] rounded-lg p-4 mb-2 shadow border border-gray-700 flex flex-col gap-2">
+                                        <div class="font-bold text-accent">${lesson.language} - ${lesson.title}</div>
+                                        <div class="text-gray-200 text-sm">${lesson.content}</div>
+                                        <button class="btn-base bg-accent text-black font-bold py-1 px-4 rounded-full" onclick="window.showLessonDetails('${lesson._id}')">Details</button>
+                                    </div>
+                                `).join('');
+                            } else {
+                                lessonsList.innerHTML = '<div class="text-red-400">No lessons found.</div>';
+                            }
+                        });
+                    }
+                    window.showLessonDetails = async (id) => {
+                        const lesson = await window.fetchLessonById(id);
+                        if (lesson) {
+                            showToast('Lesson Details', `${lesson.language}: ${lesson.title}`, 5000);
+                            lessonsList.innerHTML += `<div class='mt-2 p-4 bg-[#1A1A2A] rounded-lg border border-accent'><div class='font-bold text-accent'>${lesson.title}</div><div class='text-gray-200'>${lesson.content}</div></div>`;
+                        }
+                    };
+                }
+                if (pageName === 'profile') {
+                    // Login backend interaction
+                    const loginBtn = document.getElementById('login-btn');
+                    if (loginBtn) {
+                        loginBtn.addEventListener('click', async () => {
+                            const email = document.getElementById('login-email').value;
+                            const password = document.getElementById('login-password').value;
+                            try {
+                                const res = await fetch('http://localhost:5000/api/auth/login', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ email, password })
+                                });
+                                const data = await res.json();
+                                if (data.token) {
+                                    localStorage.setItem('authToken', data.token);
+                                    showToast('Login', 'Login successful!', 3000);
+                                } else {
+                                    showToast('Login', data.message || 'Login failed.', 3000);
+                                }
+                            } catch (err) {
+                                showToast('Login', 'Login error.', 3000);
+                            }
+                        });
+                    }
+                    enableSwipeSheet('profile-sheet');
+                    // Gesture to close bottom sheet by swiping down
+                    const sheet = document.getElementById('profile-sheet');
+                    let startY = null;
+                    sheet.addEventListener('touchstart', (e) => {
+                        if (e.touches.length === 1) startY = e.touches[0].clientY;
+                    });
+                    sheet.addEventListener('touchend', (e) => {
+                        if (startY !== null && e.changedTouches[0].clientY - startY > 100) {
+                            sheet.style.transform = 'translateY(100%)';
+                            setTimeout(() => { sheet.style.display = 'none'; }, 400);
+                        }
+                        startY = null;
+                    });
+                    // Register backend interaction with validation
+                    const signupForm = document.getElementById('signup-form');
+                    if (signupForm) {
+                        signupForm.addEventListener('submit', async (e) => {
+                            e.preventDefault();
+                            const name = document.getElementById('reg-name').value.trim();
+                            const email = document.getElementById('reg-email').value.trim();
+                            const phone = document.getElementById('reg-phone').value.trim();
+                            const password = document.getElementById('reg-password').value;
+                            const countrySelect = document.getElementById('reg-country');
+                            const country = countrySelect ? countrySelect.value : 'NG';
+                            if (!name || !email || !phone || !password) {
+                                showToast('Validation', 'All fields are required.', 3000);
+                                return;
+                            }
+                            await window.registerUser(name, email, password, phone, country);
+                        });
+                    }
+                    // Login backend interaction with validation
+                    const signinForm = document.getElementById('signin-form');
+                    if (signinForm) {
+                        signinForm.addEventListener('submit', async (e) => {
+                            e.preventDefault();
+                            const email = document.getElementById('login-email').value.trim();
+                            const password = document.getElementById('login-password').value;
+                            if (!email || !password) {
+                                showToast('Validation', 'Email and password required.', 3000);
+                                return;
+                            }
+                            try {
+                                const res = await fetch('http://localhost:5000/api/auth/login', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ email, password })
+                                });
+                                const data = await res.json();
+                                if (data.token) {
+                                    localStorage.setItem('authToken', data.token);
+                                    showToast('Login', 'Login successful!', 3000);
+                                } else {
+                                    showToast('Login', data.message || 'Login failed.', 3000);
+                                }
+                            } catch (err) {
+                                showToast('Login', 'Login error.', 3000);
+                            }
+                        });
+                    }
+                    // API Key generation button
+                    const apiKeyBtn = document.createElement('button');
+                    apiKeyBtn.className = 'btn-base bg-accent text-black font-bold py-2 px-6 rounded-full mt-2';
+                    apiKeyBtn.textContent = 'Generate API Key';
+                    apiKeyBtn.onclick = async () => {
+                        const token = localStorage.getItem('authToken');
+                        if (!token) {
+                            showToast('API Key', 'Please login first.', 4000);
+                            return;
+                        }
+                        try {
+                            const res = await fetch('http://localhost:5000/api/users/generate-api-key', {
+                                method: 'POST',
+                                headers: { 'Authorization': `Bearer ${token}` }
+                            });
+                            const data = await res.json();
+                            if (data.apiKey) {
+                                showToast('API Key', `Your API Key: ${data.apiKey}`, 8000);
+                            } else {
+                                showToast('API Key', data.message || 'Failed to generate API Key.', 4000);
+                            }
+                        } catch (err) {
+                            showToast('API Key', 'Error generating API Key.', 4000);
+                        }
+                    };
+                    document.getElementById('profile-data').parentNode.appendChild(apiKeyBtn);
+                    // Analytics
+                    const analyticsBtn = document.createElement('button');
+                    analyticsBtn.className = 'btn-base bg-accent text-black font-bold py-2 px-6 rounded-full mt-2';
+                    analyticsBtn.textContent = 'View Analytics';
+                    analyticsBtn.onclick = async () => {
+                        const token = document.getElementById('profile-token').value;
+                        const analytics = await window.fetchUserAnalytics(token);
+                        if (analytics) {
+                            showToast('Achievements', analytics.achievements.join(', '), 4000);
+                        }
+                    };
+                    document.getElementById('profile-data').parentNode.appendChild(analyticsBtn);
+                    // Notification
+                    const notifyBtn = document.createElement('button');
+                    notifyBtn.className = 'btn-base bg-accent text-black font-bold py-2 px-6 rounded-full mt-2';
+                    notifyBtn.textContent = 'Send Notification';
+                    notifyBtn.onclick = async () => {
+                        const token = document.getElementById('profile-token').value;
+                        await window.sendNotification(token, 'Keep learning!');
+                    };
+                    document.getElementById('profile-data').parentNode.appendChild(notifyBtn);
+                    // Social Share
+                    const shareBtn = document.createElement('button');
+                    shareBtn.className = 'btn-base bg-accent text-black font-bold py-2 px-6 rounded-full mt-2';
+                    shareBtn.textContent = 'Share Progress';
+                    shareBtn.onclick = async () => {
+                        const token = document.getElementById('profile-token').value;
+                        await window.shareProgress(token);
+                    };
+                    document.getElementById('profile-data').parentNode.appendChild(shareBtn);
+                }
+            };
+
+            const updateNav = (pageName) => {
+                navLinks.forEach(link => {
+                    link.classList.remove('active-link', 'text-accent', 'bg-[#232323]', 'shadow-accent');
+                    link.classList.add('text-gray-400');
+                    if (link.getAttribute('data-page') === pageName) {
+                        link.classList.add('active-link', 'text-accent', 'bg-[#232323]', 'shadow-accent');
+                        link.classList.remove('text-gray-400');
+                        link.setAttribute('aria-current', 'page');
+                    } else {
+                        link.removeAttribute('aria-current');
+                    }
+                });
+            };
+
+            const router = {
+                navigate: (page) => {
+                    window.history.pushState({ page: page }, '', `#${page}`);
+                    renderPage(page);
+                },
+                init: () => {
+                    window.addEventListener('popstate', (e) => {
+                        const page = e.state ? e.state.page : 'home';
+                        renderPage(page);
+                    });
+                    navLinks.forEach(link => {
+                        link.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            const page = link.getAttribute('data-page');
+                            router.navigate(page);
+                        });
+                    });
+                    const initialPage = window.location.hash.slice(1) || 'home';
+                    router.navigate(initialPage);
+                }
+            };
+
+            // --- Authentication and Storage ---
+            const checkAuth = () => {
+                const authToken = localStorage.getItem('authToken');
+                const sessionCookie = document.cookie.split(';').find(c => c.trim().startsWith('session='));
+                if (authToken && sessionCookie) {
+                    state.loggedIn = true;
+                    localStorage.setItem('userId', userId);
+                    return true;
+                }
+                return false;
+            };
+
+            const showCookieModal = () => {
+                if (!checkAuth()) {
+                    cookieModal.classList.remove('hidden');
+                    initModalThreejs();
+                } else {
+                    hidePreloader();
+                }
+            };
+
+            document.getElementById('accept-cookies').addEventListener('click', () => {
+                const authToken = crypto.randomUUID();
+                localStorage.setItem('authToken', authToken);
+                document.cookie = `session=${authToken}; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/`;
+                cookieModal.classList.add('hidden');
+                hidePreloader();
+                showToast('Welcome!', 'Authentication successful.', 5000);
+            });
+            
+            // --- Helper Functions ---
+            // Example: Register user via backend
+            window.registerUser = async (name, email, password) => {
+                try {
+                    const res = await fetch('http://localhost:5000/api/users/register', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name, email, password, phone, country })
+                    });
+                    const data = await res.json();
+                    showToast('Registration', data.message || 'User registered.', 3000);
+                } catch (err) {
+                    showToast('Error', 'Registration failed.', 3000);
+                }
+            };
+
+            // Example: Fetch lessons from backend
+            window.fetchLessons = async () => {
+                try {
+                    const res = await fetch('http://localhost:5000/api/lessons');
+                    const lessons = await res.json();
+                    showToast('Lessons', `Fetched ${Array.isArray(lessons) ? lessons.length : 0} lessons.`, 3000);
+                    return lessons;
+                } catch (err) {
+                    showToast('Error', 'Failed to fetch lessons.', 3000);
+                    return [];
+                }
+            };
+
+            // Fetch lesson details by ID
+            window.fetchLessonById = async (id) => {
+                try {
+                    const res = await fetch(`http://localhost:5000/api/lessons/${id}`);
+                    const lesson = await res.json();
+                    showToast('Lesson', `Fetched lesson: ${lesson.title || 'N/A'}`, 3000);
+                    return lesson;
+                } catch (err) {
+                    showToast('Error', 'Failed to fetch lesson.', 3000);
+                    return null;
+                }
+            };
+
+            window.saveUsername = () => {
+                const usernameInput = document.getElementById('username-input');
+                localStorage.setItem('username', usernameInput.value);
+                router.navigate('profile');
+                showToast('Success!', 'Username updated.', 3000);
+            };
+
+            window.clearLocalData = () => {
+                localStorage.clear();
+                document.cookie = "session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                router.navigate('home');
+                showToast('Data Cleared', 'All local data has been removed.', 3000);
+            };
+
+            // --- Push Notifications ---
+            window.showToast = (title, message, duration = 3000) => {
+                currentToastId++;
+                const toast = document.createElement('div');
+                toast.id = `toast-${currentToastId}`;
+                toast.className = 'toast bg-gray-800 text-white p-4 rounded-lg shadow-lg flex items-center space-x-3 transition-transform transform translate-x-full opacity-0';
+                toast.innerHTML = `
+                    <i class="fas fa-bell text-accent text-lg"></i>
+                    <div>
+                        <div class="font-bold">${title}</div>
+                        <div class="text-sm">${message}</div>
+                    </div>
+                `;
+                toastContainer.appendChild(toast);
+                setTimeout(() => {
+                    toast.classList.add('translate-x-0', 'opacity-100');
+                }, 100);
+                setTimeout(() => {
+                    toast.classList.remove('translate-x-0', 'opacity-100');
+                    toast.classList.add('translate-x-full', 'opacity-0');
+                    setTimeout(() => toast.remove(), 500);
+                }, duration);
+            };
+
+            document.addEventListener('click', e => {
+                if (e.target.closest('#notification-toggle')) {
+                    if (document.getElementById('notification-toggle').checked) {
+                        Notification.requestPermission().then(permission => {
+                            if (permission === 'granted') {
+                                showToast('Notifications Enabled!', 'You will now receive updates.');
+                            } else {
+                                document.getElementById('notification-toggle').checked = false;
+                                showToast('Notifications Blocked', 'Permission denied by user.');
+                            }
+                        });
+                    }
+                }
+            });
+
+            // --- Voice Synthesis (TTS) ---
+            window.speakLesson = (language) => {
+                const sentences = {
+                    Yoruba: "Ẹ ku akọkọ. Bawo ni? Mo wa daada. Orukọ mi ni SmartSpeak.",
+                    Igbo: "Kedu ka i mere? Eji m n'eme. Aha m bụ SmartSpeak.",
+                    Hausa: "Sannu da zuwa. Ina kwana? Lafiya lau. Sunana SmartSpeak.",
+                    Ijaw: "Weni-woni. Dōwā o? Éwíyá mō. Míni báwō SmartSpeak.",
+                    Efik: "Mesiere. Afo etie didie? Mmetie eti-eti. Enyịn̄ mi edi SmartSpeak."
+                };
+                const langCodes = {
+                    Yoruba: 'yo-NG',
+                    Igbo: 'ig-NG',
+                    Hausa: 'ha-NG',
+                    Ijaw: 'ha-NG', // Ijaw is not standard, using Hausa as a placeholder
+                    Efik: 'ha-NG' // Efik is not standard, using Hausa as a placeholder
+                };
+                const utterance = new SpeechSynthesisUtterance(sentences[language]);
+                utterance.lang = langCodes[language];
+
+                // Find a suitable voice
+                const voices = speechSynthesis.getVoices();
+                const nigerianVoice = voices.find(voice => voice.lang.includes('en-NG') || voice.lang.includes('ha-NG') || voice.lang.includes('ig-NG') || voice.lang.includes('yo-NG'));
+                if (nigerianVoice) {
+                    utterance.voice = nigerianVoice;
+                }
+                
+                speechSynthesis.speak(utterance);
+                showToast(`Speaking ${language}`, sentences[language], 8000);
+            };
+
+            // --- Three.js for Background and Modal ---
+            const initThreejs = (containerId, isModal = false) => {
+                const container = document.getElementById(containerId);
+                if (!container) return;
+
+                const scene = new THREE.Scene();
+                const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+                const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+                renderer.setSize(container.clientWidth, container.clientHeight);
+                container.appendChild(renderer.domElement);
+
+                // Create particle geometry
+                const geometry = new THREE.BufferGeometry();
+                const count = 500;
+                const positions = new Float32Array(count * 3);
+                for (let i = 0; i < count * 3; i++) {
+                    positions[i] = (Math.random() - 0.5) * 50;
+                }
+                geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+                // Create particle material
+                const material = new THREE.PointsMaterial({
+                    color: 0xBBF800,
+                    size: isModal ? 0.2 : 0.1,
+                    transparent: true,
+                    opacity: 0.6
+                });
+
+                // Create particles
+                particles = new THREE.Points(geometry, material);
+                scene.add(particles);
+
+                camera.position.z = isModal ? 5 : 10;
+
+                const animate = () => {
+                    requestAnimationFrame(animate);
+                    if (particles) {
+                        particles.rotation.x += 0.0005;
+                        particles.rotation.y += 0.0005;
+                    }
+                    if (isModal) {
+                        camera.position.x = Math.sin(Date.now() * 0.0005) * 1;
+                        camera.position.y = Math.cos(Date.now() * 0.0005) * 1;
+                        camera.lookAt(scene.position);
+                    }
+                    renderer.render(scene, camera);
+                };
+
+                const onResize = () => {
+                    camera.aspect = container.clientWidth / container.clientHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(container.clientWidth, container.clientHeight);
+                };
+
+                window.addEventListener('resize', onResize);
+                animate();
+
+                if (!isModal) {
+                    threejsScene = scene;
+                    threejsCamera = camera;
+                    threejsRenderer = renderer;
+                }
+            };
+
+            const initModalThreejs = () => {
+                initThreejs('modal-threejs', true);
+            };
+
+            const updateLoadingBar = (progress) => {
+                const loadingBar = document.getElementById('loading-bar');
+                loadingBar.style.width = `${progress}%`;
+            };
+
+            const hidePreloader = () => {
+                preloader.style.opacity = '0';
+                setTimeout(() => {
+                    preloader.style.display = 'none';
+                    app.classList.remove('opacity-0');
+                    app.classList.add('opacity-100');
+                    router.init();
+                }, 1000);
+            };
+
+            // Initial startup sequence
+            window.onload = () => {
+                initThreejs('threejs-container');
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += 10;
+                    updateLoadingBar(progress);
+                    if (progress >= 100) {
+                        clearInterval(interval);
+                        showCookieModal();
+                    }
+                }, 100);
+            };
+        });
+    </script>
+</body>
+</html>

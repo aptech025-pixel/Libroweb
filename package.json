@@ -1,0 +1,9 @@
+{
+  "name": "smartspeak-spa",
+  "version": "1.0.0",
+  "description": "SmartSpeak SPA static frontend for Vercel",
+  "scripts": {},
+  "dependencies": {},
+  "devDependencies": {},
+  "license": "MIT"
+}

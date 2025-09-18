@@ -1,0 +1,11 @@
+# Vercel Ignore Build Step
+# Prevent Vercel from running backend/server.js as an API/serverless function
+# Only deploy static frontend files
+index.html
+assets/
+scripts/
+styles/
+manifest.json
+vercel.json
+README.md
+LICENSE

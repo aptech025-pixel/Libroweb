@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="#BBF800">
+  <circle cx="50" cy="50" r="40" stroke="#BBF800" stroke-width="4" fill="none"/>
+  <circle cx="50" cy="50" r="30" stroke="#BBF800" stroke-width="2" fill="none"/>
+  <circle cx="50" cy="50" r="15" fill="#BBF800"/>
+  <text x="50" y="57" font-family="Verdana, Inter, sans-serif" font-size="32" text-anchor="middle" fill="#000" font-weight="bold">S</text>
+  <!-- Example FontAwesome icon: Home -->
+  <g transform="translate(70,70) scale(0.7)">
+    <path d="M32 12l-20 20h6v12h8v-8h4v8h8V32h6z" fill="#000"/>
+  </g>
+</svg>

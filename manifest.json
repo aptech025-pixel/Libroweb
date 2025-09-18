@@ -1,0 +1,39 @@
+{
+  "name": "SmartSpeak",
+  "short_name": "SmartSpeak",
+  "description": "Your guide to speaking Nigerian languages.",
+  "keywords": [
+    "SmartSpeak",
+    "Nigerian languages",
+    "Yoruba",
+    "Igbo",
+    "Hausa",
+    "Ijaw",
+    "Efik",
+    "language learning",
+    "African languages",
+    "learn Yoruba",
+    "learn Igbo",
+    "learn Hausa",
+    "language app",
+    "mobile language app",
+    "Nigerian culture",
+    "speak Nigerian languages"
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0d0d0d",
+  "theme_color": "#BBF800",
+  "icons": [
+    {
+      "src": "assets/smartspeak-logo.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "assets/smartspeak-logo.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}
