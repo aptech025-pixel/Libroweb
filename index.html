@@ -234,11 +234,19 @@
     <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
 
     <script>
-        // Check for Service Worker support
+        // Enhanced Service Worker registration for offline and push notifications
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('service-worker.js').then(registration => {
                     console.log('Service Worker registered with scope:', registration.scope);
+                    // Request push notification permission
+                    if (window.Notification && Notification.permission !== 'granted') {
+                        Notification.requestPermission().then(permission => {
+                            if (permission === 'granted') {
+                                console.log('Push notifications enabled.');
+                            }
+                        });
+                    }
                 }).catch(err => {
                     console.log('Service Worker registration failed:', err);
                 });
